@@ -84,13 +84,10 @@ def extract_text(img):
     img = cv2.erode(img, kernel, iterations=1)
     img = opening(img)
 
-    height, width = img.shape
-
-
-    cv2.namedWindow("output", cv2.WINDOW_NORMAL)    # Create window with freedom of dimensions
-    cv2.imshow('output', img)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.namedWindow("output", cv2.WINDOW_NORMAL)    # Create window with freedom of dimensions
+    # cv2.imshow('output', img)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
     text = pytesseract.image_to_string(img, config='--psm 6')
 
 
@@ -102,16 +99,19 @@ def extract_text(img):
     pattern = r'([A-Z\s\-]+)\s+(\d+\s*[\.\,]?\s*\d*)'
 
     wordPattern2 = r'^.*?(?=\s*\d+\s*[\.\,]?\s*\d+\s*$)'
-    rakamPattern2 = r'\b\d+\s*[\.\,]?\s*\d+\s*$'
+    #rakamPattern2 = r'\b\d+\s*[\.\,]?\s*\d+\s*$'
+    rakamPattern2 = r'\d+\s*[\.\,]?\s*\d+\s*$'
 
     matches = re.findall(pattern, text)
 
     for s in text.splitlines():
+        # print('s is:', s, end=' \t')
         ra = re.findall(rakamPattern2, s)
         s = re.sub(r'[^\w\s]', '', s)
         s = s.strip()
-        print(s)
         w = re.findall(wordPattern2, s)
+        # print('ra is:', ra, end = ' \t')
+        # print('w is:', w, end = ' \t')
         if(w):
             w = w[0].strip()
             #w = re.sub(r'[^\w\s]', '', w)
