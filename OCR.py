@@ -82,40 +82,48 @@ def extract_text(img):
     # erosion section
     erosionKernel = np.ones((5, 5), np.uint8)
     img = cv2.erode(img, kernel, iterations=1)
-
     img = opening(img)
 
-    cv2.namedWindow("output", cv2.WINDOW_NORMAL)  # Create window with freedom of dimensions
+    height, width = img.shape
+
+
+    cv2.namedWindow("output", cv2.WINDOW_NORMAL)    # Create window with freedom of dimensions
     cv2.imshow('output', img)
     cv2.waitKey()
-
-    # closing all open windows
     cv2.destroyAllWindows()
-
-    # d = pytesseract.image_to_data(img, output_type=Output.DICT,config='--oem 3 --psm 6')
-    # n_boxes = len(d['text'])
-    # for i in range(n_boxes):
-    #     if int(d['conf'][i]) > 10:
-    #         (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
-    #         img = cv2.rectangle(img, (x, y), (x + w, y + h), (125, 255, 125), 2)
-    #
-    # cv2.namedWindow("output", cv2.WINDOW_NORMAL)    # Create window with freedom of dimensions
-    # cv2.imshow('output', img)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
     text = pytesseract.image_to_string(img, config='--psm 6')
-    print(text)
+
+
+    #print('text:', text)
     data = []
     t = []
     prices = []
 
-    word = r'([A-Z\s]+)'
-    rakam = r'(\d+,\d+)'
+    pattern = r'([A-Z\s\-]+)\s+(\d+\s*[\.\,]?\s*\d*)'
+
+    wordPattern2 = r'^.*?(?=\s*\d+\s*[\.\,]?\s*\d+\s*$)'
+    rakamPattern2 = r'\b\d+\s*[\.\,]?\s*\d+\s*$'
+
+    matches = re.findall(pattern, text)
 
     for s in text.splitlines():
-        s = re.sub(r'(?<=\d),\s+', ',', s)
-        w = re.findall(word, s)
-        ra = re.findall(rakam, s)
+        ra = re.findall(rakamPattern2, s)
+        s = re.sub(r'[^\w\s]', '', s)
+        s = s.strip()
+        print(s)
+        w = re.findall(wordPattern2, s)
+        if(w):
+            w = w[0].strip()
+            #w = re.sub(r'[^\w\s]', '', w)
+
+
+        if(w and ra):
+
+            number_str = ra[0].replace(',', '.')  # Virgülü noktaya dönüştürme
+            number_str = re.sub(r'\s+', '', number_str)
+            number_float = float(number_str)
+            print('text is: ', w, end= ' \t')
+            print('rakam is: ', number_float)
         # data.append(eslesmeler)
         #if (ra):
             #print('word is', w, end='   ')
@@ -127,17 +135,17 @@ img = cv2.imread('test.jpg')
 
 # aslında 4 yerine 2 de yetiyor.
 height, width, channels = img.shape
-new_height = height // 4
+new_height = height // 3
 
-for i in range(4):
+for i in range(3):
     y1 = i * new_height
     y2 = (i + 1) * new_height
 
     tempIm = img[y1:y2,:]
 
-    cv2.namedWindow("output", cv2.WINDOW_NORMAL)  # Create window with freedom of dimensions
-    cv2.imshow('output', tempIm)
-    cv2.waitKey()
+    # cv2.namedWindow("output", cv2.WINDOW_NORMAL)  # Create window with freedom of dimensions
+    # cv2.imshow('output', tempIm)
+    # cv2.waitKey()
     extract_text(tempIm)
 
 # half_height = height//2
