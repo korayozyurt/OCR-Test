@@ -2,10 +2,7 @@ from PIL import Image
 import pytesseract
 import re
 import cv2
-from matplotlib import pyplot as plt
-from pytesseract import Output
 import numpy as np
-
 
 # get grayscale image
 def get_grayscale(image):
@@ -79,42 +76,22 @@ def extract_text(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
-    # erosion section
-    erosionKernel = np.ones((5, 5), np.uint8)
     img = cv2.erode(img, kernel, iterations=1)
     img = opening(img)
 
-    # cv2.namedWindow("output", cv2.WINDOW_NORMAL)    # Create window with freedom of dimensions
-    # cv2.imshow('output', img)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
     text = pytesseract.image_to_string(img, config='--psm 6')
 
-
-    #print('text:', text)
-    data = []
-    t = []
-    prices = []
-
-    pattern = r'([A-Z\s\-]+)\s+(\d+\s*[\.\,]?\s*\d*)'
-
-    wordPattern2 = r'^.*?(?=\s*\d+\s*[\.\,]?\s*\d+\s*$)'
-    #rakamPattern2 = r'\b\d+\s*[\.\,]?\s*\d+\s*$'
-    rakamPattern2 = r'\d+\s*[\.\,]?\s*\d+\s*$'
-
-    matches = re.findall(pattern, text)
+    wordPattern = r'^.*?(?=\s*\d+\s*[\.\,]?\s*\d+\s*$)'
+    rakamPattern = r'\d+\s*[\.\,]?\s*\d+\s*$'
 
     for s in text.splitlines():
         s = re.sub(r'[^\w\s,]|_', '', s)
         s = s.strip().replace('x', '')
-        ra = re.findall(rakamPattern2, s)
-        w = re.findall(wordPattern2, s)
-        # print('ra is:', ra, end = ' \t')
-        # print('w is:', w, end = ' \t')
+        ra = re.findall(rakamPattern, s)
+        w = re.findall(wordPattern, s)
+
         if(w):
             w = w[0].strip()
-            #w = re.sub(r'[^\w\s]', '', w)
-
 
         if(w and ra):
 
@@ -123,10 +100,7 @@ def extract_text(img):
             number_float = float(number_str)
             print('text is: ', w, end= ' \t')
             print('rakam is: ', number_float)
-        # data.append(eslesmeler)
-        #if (ra):
-            #print('word is', w, end='   ')
-            #print(ra)
+
 
 pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
@@ -142,18 +116,6 @@ for i in range(3):
 
     tempIm = img[y1:y2,:]
 
-    # cv2.namedWindow("output", cv2.WINDOW_NORMAL)  # Create window with freedom of dimensions
-    # cv2.imshow('output', tempIm)
-    # cv2.waitKey()
     extract_text(tempIm)
 
-# half_height = height//2
-#
-# top_section = img[:half_height, :]
-# bottom_section = img[half_height:, :]
-#
-# extract_text(top_section)
-# extract_text(bottom_section)
-
-#print(data)
 
