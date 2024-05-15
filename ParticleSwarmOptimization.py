@@ -8,17 +8,21 @@ gBestX = 0
 gBestVal = 0
 c1 = 1
 c2 = 1
-iteration = 500
+w = 0.5
+iteration = 1500
 
 suruX = [-9.6, -6, -2.6, -1.1, 0.6, 2.3, 2.8, 8.3, 10]
 velocity = [0,0,0,0,0,0,0,0,0]
 pBest = [-9.6,-6,-2.6,-1.1,0.6,2.3,2.8,8.3,10]
+pBestVal = [0,0,0,0,0,0,0,0,0]
+
+print('start')
 
 def mainFunction(x):
-    return -(x**2) +5 * x + 20
+    return -(x**2)+5*x+20
 
 def calculateNextVelocity(x, v, pBest, r1, r2):
-    return v + c1*r1*(pBest - x) + c2 * r2 * (gBestX - x)
+    return (w*v) + (c1*r1*(pBest - x)) + (c2 * r2 * (gBestX - x))
 
 def calculateNextX(x,v):
     return x + v
@@ -48,20 +52,23 @@ if(tempBest > gBestVal):
     gBestX = tempGBestX
 
 epok = 0
+
+pBestVal = [mainFunction(x) for x in suruX]
 while(epok < iteration):
     r1 = rnd.random()
     r2 = rnd.random()
+    print('GBest is: ', gBestX, 'val is: ', gBestVal, ' random1: ' , r1, ' random2: ', r2)
 
     for i in range(len(suruX)):
         v1 = calculateNextVelocity(suruX[i], velocity[i], pBest[i], r1, r2)
         x1 = calculateNextX(suruX[i], v1)
 
-        if(x1 >= -10 and x1 <= 10):
-            suruX[i], velocity[i] = x1, v1
+        suruX[i], velocity[i] = x1, v1
 
-            parcacikDeger = mainFunction(suruX[i])
-            if (parcacikDeger > pBest[i]):
-                pBest[i] = parcacikDeger
+        parcacikDeger = mainFunction(suruX[i])
+        if (parcacikDeger > pBestVal[i]):
+            pBest[i] = suruX[i]
+            pBestVal[i] = parcacikDeger
 
     tempGBestX, tempBest = calculateGBest()
     if (tempBest > gBestVal):

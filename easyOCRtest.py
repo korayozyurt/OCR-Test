@@ -4,6 +4,7 @@ import re
 import cv2
 from matplotlib import pyplot as plt
 from pytesseract import Output
+import easyocr
 import numpy as np
 
 
@@ -84,14 +85,14 @@ def extract_text(img):
     img = cv2.erode(img, kernel, iterations=1)
     img = opening(img)
 
-    # cv2.namedWindow("output", cv2.WINDOW_NORMAL)    # Create window with freedom of dimensions
-    # cv2.imshow('output', img)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
-    text = pytesseract.image_to_string(img, config='--psm 6')
+    reader = easyocr.Reader(['tr'])  # this needs to run only once to load the model into memory
+    result = reader.readtext(img)
+    print(result)
+    text = '';
+    #text = pytesseract.image_to_string(img, config='--psm 6')
 
 
-    #print('text:', text)
+    print('maişntext:', text)
     data = []
     t = []
     prices = []
@@ -104,10 +105,12 @@ def extract_text(img):
 
     matches = re.findall(pattern, text)
 
+
     for s in text.splitlines():
-        s = re.sub(r'[^\w\s,]|_', '', s)
-        s = s.strip().replace('x', '')
+        # print('s is:', s, end=' \t')
         ra = re.findall(rakamPattern2, s)
+        s = re.sub(r'[^\w\s]', '', s)
+        s = s.strip()
         w = re.findall(wordPattern2, s)
         # print('ra is:', ra, end = ' \t')
         # print('w is:', w, end = ' \t')
@@ -121,12 +124,9 @@ def extract_text(img):
             number_str = ra[0].replace(',', '.')  # Virgülü noktaya dönüştürme
             number_str = re.sub(r'\s+', '', number_str)
             number_float = float(number_str)
-            print('text is: ', w, end= ' \t')
-            print('rakam is: ', number_float)
-        # data.append(eslesmeler)
-        #if (ra):
-            #print('word is', w, end='   ')
-            #print(ra)
+            #print('text is: ', w, end= ' \t')
+            #print('rakam is: ', number_float)
+
 
 pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
@@ -142,18 +142,5 @@ for i in range(3):
 
     tempIm = img[y1:y2,:]
 
-    # cv2.namedWindow("output", cv2.WINDOW_NORMAL)  # Create window with freedom of dimensions
-    # cv2.imshow('output', tempIm)
-    # cv2.waitKey()
     extract_text(tempIm)
-
-# half_height = height//2
-#
-# top_section = img[:half_height, :]
-# bottom_section = img[half_height:, :]
-#
-# extract_text(top_section)
-# extract_text(bottom_section)
-
-#print(data)
 

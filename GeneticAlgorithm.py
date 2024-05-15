@@ -18,7 +18,8 @@ def create_chromosome():
     return [rnd.randint(0,30) for x in range(0,gen_size)]
 
 def create_initial_pop():
-    return [create_chromosome() for x in range(0, pop_size)]
+    #return [create_chromosome() for x in range(0, pop_size)]
+    return [[3,3,13,13],[5,10,18,28],[29,21,18,8],[9,22,2,21],[13,21,16,2],[18,5,16,28]]
 
 def probability(fitness_values):
     P = []
